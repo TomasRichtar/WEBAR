@@ -256,6 +256,7 @@
         audio: false,
       };
       window.requestingForCameraPermission = false;
+
       async function RequestWebcam() {
         window.requestingForCameraPermission = true;
         try {
@@ -268,8 +269,9 @@
 
           console.log("Webcam access granted");
           requestingForCameraPermission = false;
+
+          document.getElementById("bg-video").style.display = "none";
         } catch (err) {
-          //user denied camera permission - show error panel
           console.error("getUserMedia error - ", err);
           ShowError(
             "Failed to start the experience. Camera permission was denied"
@@ -277,6 +279,7 @@
           window.requestingForCameraPermission = false;
         }
       }
+
       async function StartWebcam() {
         console.log("StartWebcam");
 
