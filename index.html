@@ -18,6 +18,25 @@
     <link rel="stylesheet" href="TemplateData/style.css" />
   </head>
   <body>
+    <video
+      id="bg-video"
+      autoplay
+      muted
+      playsinline
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+      "
+    >
+      <source src="OBP_video.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
     <div
       id="threejs-bg"
       style="
@@ -26,7 +45,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 1;
+        z-index: -1;
       "
     ></div>
     <!--Webcam & Canvas Layers -->
@@ -122,98 +141,6 @@
     <script src="wtracker.js" type="text/javascript"></script>
     <script src="Build/Builds.loader.js"></script>
 
-    <script type="module">
-      import * as THREE from "https://esm.sh/three@0.160.0";
-      import { GLTFLoader } from "https://esm.sh/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-
-      let scene, camera, renderer, model, loader;
-
-      function initThreeJS() {
-        const container = document.getElementById("threejs-bg");
-
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(
-          1.5,
-          container.clientWidth / container.clientHeight,
-          0.1,
-          1000
-        );
-        camera.position.z = 3;
-
-        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setClearColor(0x000000, 0);
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
-        scene.add(hemiLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-        dirLight.position.set(5, 10, 7.5);
-        scene.add(dirLight);
-
-        loader = new GLTFLoader();
-        loader.load(
-          "volleyball-threejs.glb",
-          (gltf) => {
-            model = gltf.scene;
-            model.scale.set(1, 1, 1);
-            scene.add(model);
-            animate();
-          },
-          undefined,
-          (error) => {
-            console.error("Failed to load GLB model:", error);
-          }
-        );
-      }
-
-      function animate() {
-        requestAnimationFrame(animate);
-
-        if (model) {
-          model.rotation.y += 0.01;
-          model.rotation.x += 0.0;
-        }
-
-        renderer.render(scene, camera);
-      }
-
-      function updateModelRotation(event) {
-        if (!model) return;
-
-        const x = THREE.MathUtils.degToRad(event.beta || 0);
-        const y = THREE.MathUtils.degToRad(event.gamma || 0);
-        model.rotation.x = x;
-        model.rotation.y = y;
-      }
-
-      function requestGyroAccess() {
-        if (
-          typeof DeviceOrientationEvent !== "undefined" &&
-          typeof DeviceOrientationEvent.requestPermission === "function"
-        ) {
-          DeviceOrientationEvent.requestPermission()
-            .then((response) => {
-              if (response === "granted") {
-                window.addEventListener(
-                  "deviceorientation",
-                  updateModelRotation
-                );
-              }
-            })
-            .catch(console.error);
-        } else {
-          window.addEventListener("deviceorientation", updateModelRotation);
-        }
-      }
-
-      window.addEventListener("DOMContentLoaded", () => {
-        initThreeJS();
-        window.addEventListener("click", requestGyroAccess, { once: true });
-      });
-    </script>
-
     <script>
       //Dynamic background
       const gradientElement = document.getElementById("gradient-background");
@@ -230,6 +157,7 @@
                 window.addEventListener("deviceorientation", handleOrientation);
               }
             })
+
             .catch(console.error);
         } else {
           // Non-iOS or older devices
@@ -287,7 +215,6 @@
         canvas.style.width = window.innerWidth + "px";
         canvas.style.height = window.innerHeight + "px";
 
-        document.getElementById("threejs-bg").style.display = "none";
         document.getElementById("startARDiv").style.display = "none";
         createUnityInstance(
           document.querySelector("#unity-canvas"),
@@ -307,18 +234,14 @@
             progressBarFull.style.width = 100 * progress + "%";
           }
         ).then((unityInstance) => {
-          if (vantaEffect) {
-            vantaEffect.destroy();
-          }
-
           window.unityInstance = unityInstance;
+          document.getElementById("threejs-bg").style.display = "none";
           RequestWebcam();
 
           loadingBar.style.display = "none";
         });
-        StartMotionSensors();
 
-        //Call Start GPS here --> StartGPS();
+        StartMotionSensors();
 
         loadingBar.style.display = "block";
       }
@@ -493,23 +416,6 @@
         document.getElementById("screenshotImg").style.height =
           (80 / window.innerWidth) * window.innerHeight + "vw";
       }
-
-      let vantaEffect;
-
-      document.addEventListener("DOMContentLoaded", function () {
-        if (typeof VANTA !== "undefined" && VANTA.HALO) {
-          vantaEffect = VANTA.HALO({
-            el: "#vanta-bg",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: true,
-            baseColor: 0x222244,
-            backgroundColor: 0x000000,
-          });
-        } else {
-          console.error("VANTA or VANTA.HALO is not available.");
-        }
-      });
     </script>
   </body>
 </html>
