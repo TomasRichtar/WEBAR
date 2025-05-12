@@ -180,7 +180,7 @@
       }
 
       function updateModelRotation(event) {
-        if (!model || window.unityInstance) return;
+        if (!model) return;
 
         const x = THREE.MathUtils.degToRad(event.beta || 0);
         const y = THREE.MathUtils.degToRad(event.gamma || 0);
@@ -230,7 +230,6 @@
                 window.addEventListener("deviceorientation", handleOrientation);
               }
             })
-
             .catch(console.error);
         } else {
           // Non-iOS or older devices
@@ -288,6 +287,7 @@
         canvas.style.width = window.innerWidth + "px";
         canvas.style.height = window.innerHeight + "px";
 
+        document.getElementById("threejs-bg").style.display = "none";
         document.getElementById("startARDiv").style.display = "none";
         createUnityInstance(
           document.querySelector("#unity-canvas"),
@@ -307,14 +307,18 @@
             progressBarFull.style.width = 100 * progress + "%";
           }
         ).then((unityInstance) => {
+          if (vantaEffect) {
+            vantaEffect.destroy();
+          }
+
           window.unityInstance = unityInstance;
-          document.getElementById("threejs-bg").style.display = "none";
           RequestWebcam();
 
           loadingBar.style.display = "none";
         });
-
         StartMotionSensors();
+
+        //Call Start GPS here --> StartGPS();
 
         loadingBar.style.display = "block";
       }
