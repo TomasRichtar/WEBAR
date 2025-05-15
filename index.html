@@ -62,11 +62,17 @@
     ></canvas>
     <!--UI: Startup Message -->
     <div id="startARDiv" class="ctaDiv">
-      <h1>ALERT</h1>
-      <p class="popup-text">
+      <h1 data-lang="en">Ready to Begin?</h1>
+      <p class="popup-text" data-lang="en">
         This augmented reality experience requires access to your device's
         camera and motion sensors.
       </p>
+      <h1 data-lang="cz" style="display: none">Začněme!</h1>
+      <p class="popup-text" data-lang="cz" style="display: none">
+        Tato rozšířená realita vyžaduje přístup k fotoaparátu a pohybovým
+        senzorům vašeho zařízení.
+      </p>
+
       <button
         class="allow-button"
         id="startARButton"
@@ -142,6 +148,18 @@
     <script src="Build/Builds.loader.js"></script>
 
     <script>
+      //Detect browser language (eng/cz)
+      function setLanguage(lang) {
+        document.querySelectorAll(".popup-text").forEach((el) => {
+          el.style.display = el.dataset.lang === lang ? "block" : "none";
+        });
+      }
+
+      const userLang = navigator.language || navigator.userLanguage;
+      const langCode = userLang.toLowerCase().startsWith("cs") ? "cz" : "en";
+
+      setLanguage(langCode);
+
       //Dynamic background
       const gradientElement = document.getElementById("gradient-background");
 
@@ -271,6 +289,7 @@
           requestingForCameraPermission = false;
 
           document.getElementById("bg-video").style.display = "none";
+          console.log("video turned off");
         } catch (err) {
           console.error("getUserMedia error - ", err);
           ShowError(
