@@ -234,8 +234,8 @@
             progressBarFull.style.width = 100 * progress + "%";
           }
         ).then((unityInstance) => {
-          window.unityInstance = unityInstance;
           unityInstance.SetFullscreen(1);
+          window.unityInstance = unityInstance;
           document.getElementById("threejs-bg").style.display = "none";
           RequestWebcam();
 
